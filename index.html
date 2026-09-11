@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SENTRY — a simulated cybersecurity training and network monitoring dashboard. An educational portfolio project.">
+  <title>SENTRY · Security Operations Dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128737;</text></svg>">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Skip link for keyboard users -->
+  <a class="skip-link" href="#viewContent">Skip to content</a>
+
+  <!-- ============================================================
+       BOOT SPLASH (loading state)
+       Removed by app.js once everything is initialised.
+       ============================================================ -->
+  <div id="boot" class="boot" role="status" aria-label="Loading SENTRY">
+    <div class="boot-mark">&#128737;</div>
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Initializing SENTRY</p>
+  </div>
+
+  <!-- ============================================================
+       SIDEBAR
+       Off-canvas on small screens; toggled by the hamburger button.
+       ============================================================ -->
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <div class="sidebar-brand">
+      <span class="logo-radar" aria-hidden="true"></span>
+      <span class="logo-text">SENTRY<span class="logo-dot">.</span></span>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav" aria-label="Sections"></nav>
+
+    <div class="sidebar-foot">
+      <div class="status-pill" role="status">
+        <span class="status-dot"></span>
+        <span>
+          All systems nominal<br>
+          <small>shields: <strong id="footShield">0%</strong></small>
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Backdrop for the off-canvas sidebar on mobile -->
+  <div class="backdrop" id="backdrop" hidden></div>
+
+  <!-- ============================================================
+       TOPBAR
+       Page title, search, notifications, profile, mobile menu.
+       ============================================================ -->
+  <header class="topbar">
+    <button class="iconbtn menu-btn" id="menuBtn" aria-label="Open navigation menu" aria-expanded="false">
+      &equiv;
+    </button>
+
+    <h1 class="topbar-title" id="pageTitle">Overview</h1>
+
+    <!-- Global search -->
+    <div class="search-wrap" id="searchWrap">
+      <svg class="search-ic" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+      <input type="search" id="searchInput" class="search-input" placeholder="Search challenges, lessons, devices…" autocomplete="off" aria-label="Search the demo">
+      <button class="search-clear" id="searchClear" aria-label="Clear search">&times;</button>
+      <div class="search-results" id="searchResults" role="listbox" aria-label="Search results" hidden></div>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="iconbtn" id="notifBtn" aria-label="Notifications" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span class="notif-badge" id="notifBadge" hidden>0</span>
+      </button>
+      <button class="profile-btn" id="profileBtn" aria-label="User menu" aria-expanded="false">
+        <span class="avatar">AT</span>
+      </button>
+
+      <!-- Notifications dropdown -->
+      <div class="dropdown notif-dd" id="notifDropdown" hidden>
+        <div class="dd-head">
+          <strong>Notifications</strong>
+          <button class="linkbtn" id="markReadBtn">Mark all read</button>
+        </div>
+        <div class="dd-body" id="notifList"></div>
+      </div>
+
+      <!-- Profile dropdown -->
+      <div class="dropdown profile-dd" id="profileDropdown" hidden>
+        <div class="dd-head">
+          <span class="avatar-lg">AT</span>
+          <div>
+            <strong>Alex Trainee</strong>
+            <small>Security Analyst · Trainee</small>
+          </div>
+        </div>
+        <button class="dd-item" data-action="help">Keyboard shortcuts</button>
+        <button class="dd-item" data-action="about">About this project</button>
+        <button class="dd-item" data-action="signout">Sign out (demo)</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN VIEW
+       Each view is rendered into #viewContent by the router.
+       ============================================================ -->
+  <main class="main" id="viewContent" tabindex="-1"></main>
+
+  <!-- ============================================================
+       OVERLAYS: toasts, modal, shortcuts panel
+       ============================================================ -->
+  <div class="toast-stack" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle"></h2>
+      <p id="modalText"></p>
+      <div class="modal-actions">
+        <button class="btn" id="modalCancel">Cancel</button>
+        <button class="btn danger" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="spellBackdrop" hidden>
+    <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="spellTitle">
+      <div class="modal-head">
+        <h2 id="spellTitle">Keyboard shortcuts</h2>
+        <button class="iconbtn" id="spellClose" aria-label="Close">&#10005;</button>
+      </div>
+      <table class="kbd-table">
+        <tbody>
+          <tr><td><kbd>1</kbd>–<kbd>6</kbd></td><td>Jump to sidebar section</td></tr>
+          <tr><td><kbd>/</kbd></td><td>Focus global search</td></tr>
+          <tr><td><kbd>Escape</kbd></td><td>Close menus / dialogs</td></tr>
+          <tr><td><kbd>g</kbd> <kbd>n</kbd></td><td>Go to Network Monitor</td></tr>
+          <tr><td><kbd>?</kbd></td><td>Show this panel</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Scripts, in dependency order (classic scripts — no build step,
+       works from file:// and any static host). -->
+  <script src="js/storage.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/network.js"></script>
+  <script src="js/terminal.js"></script>
+  <script src="js/challenges.js"></script>
+  <script src="js/learning.js"></script>
+  <script src="js/logs.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

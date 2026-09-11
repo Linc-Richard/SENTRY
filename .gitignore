@@ -1,0 +1,15 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+
+# Logs and temp files
+*.log
+
+# Secrets — never commit these
+.env
+.env.*
+!.env.example
+
+# Dependencies (this project has none today; safe for the future)
+node_modules/
